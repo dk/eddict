@@ -1,0 +1,54 @@
+<html>
+<title>
+$NAME dictionary
+</title>
+<BODY BGCOLOR="#CCCCCC">
+<h3 align=center> $NAME dictionary</h3><p>
+<form method="post" action="http://your.domain.here/cgi-bin/nph-dict.cgi">
+<p align=right>
+Select dictionary<br>
+<select name="selector" onChange='location = "http://your.domain.here/cgi-bin/nph-dict.cgi?langref="+this.options[this.selectedIndex].value$JSMASTER'>
+  <option value="daen" $SELECTORdaen>Danish-English</option>
+  <option value="enda" $SELECTORenda>English-Danish</option>
+</select>
+  $MASTER
+<input type="submit" value="Go" name="submit">
+<input type="hidden" name="switch" value=1>
+<p>
+</form>
+
+<form name="text" method="post" action="http://your.domain.here/cgi-bin/nph-dict.cgi" $FORMEXTRAS>
+<table>
+<td>
+<h5>Enter word in $LANG:</h5>
+    <input type="text"   name="word" size="25" maxlength="25" value="$WORD">
+    <input type="submit" value="Go!" name="submit">
+    <input type="hidden" name="langref" value="$LANGREF">
+<br><font size=1><i>Characters &#248, &#230;, &#229; can be entered as <b>/o</b>, <b>/ae</b> and <b>/aa</b></i></font><p>
+</td><td width=50>
+</td><td>
+  $SLAVE
+  Search options:<br><font size="-1">
+    <input type="checkbox" name="brief" value="1" $BRIEF>
+    Brief translation<br>
+    <input type="checkbox" name="multi" value="1" $MULTI>
+    Multiple matches<br>
+    <input type="checkbox" name="whole" value="1" $WHOLE>
+    Whole word</font>
+</td><td>
+  encoding:<br><font size="-1">
+    <input type="radio" name="7bit" value="2" $ESEL2>
+    ø, æ, å<br>
+    <input type="radio" name="7bit" value="0" $ESEL0>
+    &#248, &#230;, &#229;<br>
+    <input type="radio" name="7bit" value="1" $ESEL1>
+    /o, /ae, /aa</font>
+<td>
+</table>
+</form>
+
+<script language="JavaScript">
+<!--
+document.text.word.focus();
+//-->
+</script>

@@ -1,0 +1,114 @@
+#!/usr/bin/perl 
+
+use strict;
+
+my $perl = $^X;
+my $dos = 0;
+
+$dos = 1 if $^O =~ /win32/i || $^O =~ /os2/i;  
+my $shd = $dos ? '\\' : '/';
+
+eval "use Prima::Config;";
+warn <<WARN if $@;
+warning: Prima toolkit is not installed or not accessible.
+  check http://www.prima.eu.org/ for details.
+WARN
+
+my $prefix = $dos ? 'C:' : '/usr/local';
+for ( @ARGV) {
+  if ( m/^PREFIX=(.*)$/) {
+     $prefix = $1;
+     $prefix =~ s/\\/\//g;
+     $prefix =~ s/\/*$//;
+  }
+}
+# die "error: '$prefix' does not exist or is not a directory\n" unless -d $prefix . '/'; 
+
+$prefix =~ s/^\~/$ENV{HOME}/ if defined $ENV{HOME}; 
+
+my $share = $dos ? "$prefix/eddict" : "$prefix/share/eddict";
+my $bin   = $dos ? "$prefix/eddict" : "$prefix/bin"; 
+my $parm  = $dos ? '%1 %2 %3 %4 %5 %6 %7 %8 %9' : '$*';
+
+my $run = "";
+my $ext = $dos ? (($^O =~ /os2/i) ? '.cmd' : '.bat' ) : ''; 
+if ( $dos) {
+   $run .= "\@echo off\n";
+   $share =~ s/\//\\/gc;
+   $bin =~ s/\//\\/gc;
+   $run .= "$1\n" if $share =~ /^([A-Za-z]:)/;
+   $run .= "cd $share\n";
+} else {
+   $run .= "#!/bin/sh\n\ncd $share\n";
+}
+
+my %files;
+opendir D, '.';
+for ( readdir D ) {
+   next if -d $_ || $_ eq 'install';
+   $files{$_} = "$share$shd$_";
+}
+closedir D;
+
+for ( qw(
+  dansk-engelsk.html
+  dansk-engelsk.html.idx
+  dansk-engelsk.html.ndx
+  engelsk-dansk.html
+  engelsk-dansk.html.idx
+  engelsk-dansk.html.ndx
+  logo.gif
+  eddict.pl
+  fdw.pl
+)) {
+   die "The distribution is incomplete: '$_' file is missing" unless -f $_;
+}
+
+die "Cannot open eddict$ext:$!\n" unless open F, "> eddict$ext";
+print F $run, "\nperl eddict.pl";
+close F;
+die "Cannot open da-en$ext:$!\n" unless open F, "> da-en$ext";
+print F $run, "\nperl fdw.pl $share${shd}dansk-engelsk.html $parm";
+close F;
+die "Cannot open en-da$ext:$!\n" unless open F, "> en-da$ext";
+print F $run, "\nperl fdw.pl $share${shd}engelsk-dansk.html $parm";
+close F;
+
+for ( qw(eddict da-en en-da)) {
+   $files{"$_$ext"} = "$bin$shd$_$ext";
+   chmod 0755, "$_$ext" unless $dos; 
+}
+
+require File::Path;
+require File::Copy;
+
+File::Path::mkpath( $share, 1, 0755);
+File::Path::mkpath( $bin, 1, 0755);
+
+for ( keys %files) {
+   die "Cannot copy $files{$_}:$!\n" unless File::Copy::copy( $_, $files{$_});
+}
+
+unless ( $dos) {
+   for ( qw(eddict da-en en-da)) {
+      chmod 0755, "$bin$shd$_$ext";
+   }
+}
+
+print <<I;
+Installation finished. The executable files installed:
+
+  $bin${shd}eddict$ext - GUI dictionary
+  $bin${shd}da-en$ext - command-line danish-english dictionary
+  $bin${shd}en-da$ext - command-line english-danish dictionary
+
+The dictionary files installed:
+  $share${shd}dansk-engelsk.html
+  $share${shd}engelsk-dansk.html
+
+  If you are not satisfied with the default files location, 
+you can re-run the installation program with PREFIX=/your/path
+argument.
+
+I
+

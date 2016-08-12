@@ -1,0 +1,32 @@
+Danish-English and English-Danish dictionary.
+
+ 
+Requirements: 
+
+ 1) perl, version 5.00503 or higher ( www.perl.com )
+ 2) Prima toolkit, version 1.05 or higher ( www.prima.eu.org )
+
+How to install:
+  1) Unzip eddict-1.0.tar.gz by doing
+ 
+     tar xzf eddict-1.0.tar.gz,
+
+    or, on systems with GNU tar,
+
+     gzip -cd Prima.tar.gz | tar xf -
+
+
+  2) run 'perl install'
+
+   With optional parameter PREFIX, which points do the installation
+   directory. The default is /usr/local for unix and C:/eddict for
+   windows and os2.
+   Example:
+
+       perl install PREFIX=/usr/local/site
+
+
+After the successfull installation, 'eddict', 'da-en' 
+and 'en-da' scripts will be accessible.
+
+Dmitry Karasik <dmitry@karasik.eu.org>

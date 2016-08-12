@@ -1,0 +1,30 @@
+#!/usr/bin/perl
+# $Id: scan,v 1.1.1.1 2005/07/26 09:16:11 dk Exp $
+# scans files that should conform to strictly incremental order
+my $last = '';
+my $c = 0;
+while (<>) {
+	$c++;
+	next unless m/^<b>(.*?)<\/b>/;
+	my $g = $1;
+	$g =~ s/^[XVI]+\.\s+//;
+	$g = lc $g;
+	$g =~ s/\.\s*//g;
+	$g =~ s/[\(\)\/\-'\s,`]//g;
+	$g =~ s/[\x{E1}]/a/g;
+	$g =~ s/[\x{81}]/y/g;
+	$g =~ s/[\x{88}\x{82}\x{8A}]/e/g;
+	$g =~ s/[\x{87}]/c/g;
+	$g =~ s/[\x{8B}]/i/g;
+	$g =~ s/[\$\x{9C}]//g;
+	
+	$g =~ s/[\x{E6}\x{C6}]/\xF0/g;
+	$g =~ s/[\x{F8}\x{D8}]/\xF1/g;
+	$g =~ s/[\x{E5}]/\xF2/g;
+	
+	$g =~ s/2/two/g;
+	$g =~ s/[\.-]$//;
+	$g =~ s/&amp;/&/g;
+	die "$c:'$g' < '$last'\n" if $g lt $last;
+	$last = $g;
+}
